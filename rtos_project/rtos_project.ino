@@ -180,7 +180,6 @@ void Task1code(void* pvParameters) {
   }
 }
 //Task3code:
-// đọc trạng thái từ cảm biến chuyển động và điều khiển 3 đèn
 void Task3code(void* pvParameters) {
   Serial.print("Task3 running on core ");
   Serial.println(xPortGetCoreID());
@@ -201,7 +200,6 @@ void Task3code(void* pvParameters) {
   }
 }
 //Task4code:
-// xử lý khi ấn nút tự động detect
 void Task4code(void* pvParameters) {
   Serial.print("Task4 running on core ");
   Serial.println(xPortGetCoreID());
@@ -237,7 +235,6 @@ void Task4code(void* pvParameters) {
 }
 
 //Task2code:
-// đọc các dữ liệu cảm biến và trạng thái thiết bị, sau đó gửi dữ liệu dưới dạng JSON tới MQTT
 void Task2code(void* pvParameters) {
   Serial.print("Task2 running on core ");
   Serial.println(xPortGetCoreID());
@@ -280,19 +277,19 @@ void Task2code(void* pvParameters) {
 
     int led2_value = digitalRead(Device_03_PIN);
     if ((led2_value != prevDeviceStates[2])) {
-      JsonObject led2_data = doc.createNestedObject(Led1_UID);
+      JsonObject led2_data = doc.createNestedObject(Led2_UID);
       led2_data["v"] = led2_value;
       led2_data["a"] = mode;
     }
 
     int led3_value = digitalRead(Device_04_PIN);
     if ((led3_value != prevDeviceStates[3])) {
-      JsonObject led3_data = doc.createNestedObject(Led2_UID);
+      JsonObject led3_data = doc.createNestedObject(Led3_UID);
       led3_data["v"] = led3_value;
       led3_data["a"] = mode;
     }
 
-    int fan_value = digitalRead(Device_04_PIN);
+    int fan_value = digitalRead(Device_05_PIN);
     if ((fan_value != prevDeviceStates[4])) {
       JsonObject fan_data = doc.createNestedObject(Fan_UID);
       fan_data["v"] = fan_value;
@@ -407,7 +404,6 @@ void setup_devide() {
   }
 }
 /*=================================== CALLBACK for MQTT =====================================================*/
-// nhận dữ liệu từ server qua MQTT
 void callback(char* topic, byte* message, unsigned int length) {
   if (strcmp(topic, commandcontrol_topic) == 0) {
     Serial.print("Message arrived on topic: ");
@@ -451,6 +447,17 @@ void callback(char* topic, byte* message, unsigned int length) {
           Serial.println("AUTO DETECTED OFF");
         }
         digitalWrite(Device_02_PIN, v);
+      }
+      if (strcmp(key, Pump_UID) == 0) {
+        Serial.print("Pump 1 ");
+        Serial.print("v: ");
+        Serial.print(v);
+        Serial.print(", a: ");
+        Serial.println(a);
+        if (a == 0) {
+          // Serial.println("AUTO DETECTED ");
+        }
+        digitalWrite(Device_01_PIN, v);
       }
       if (strcmp(key, Led2_UID) == 0) {
         Serial.print("LED 2 ");
